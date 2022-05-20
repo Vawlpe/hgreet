@@ -1,34 +1,13 @@
-# Hagreety
-## A simple example greeter made with hgreet based on agreety / agetty
-#### This is only an example, hagreety is not a good greeter, in fact it's almost certainly buggy.
-#### It is only meant to show you the basics of how to implement your own greeter in haskell using the [hgreet](https://github.com/Vawlpe/hgreet) package.
-### Installation
-- [Install greetd](https://sr.ht/~kennylevinsen/greetd/)
-- Make sure your `greeter` user has a proper home directory:
-  ```shell
-  sudo mkdir /home/greeter
-  sudo usermod -d /home/greeter greeter
-  ```
-- **As the** ***greeter*** **user**, [Install GHCup](https://www.haskell.org/ghcup/)
-- Still ***as the greeter user***, Clone this repository:
-  ```shell
-  git clone https://github.com/Vawlpe/hagreety.git
-  ```
-- And (still as the ***greeter*** user), build and install hagreety:
-  ```shell
-  cd hagreety
-  cabal install
-  ```
-- Finally, edit and save the `/etc/greetd/config.toml` file as ***root*** to replace the `default_session` section with the following:
-  ```toml
-  [default_session]
-  command = "~/hagreety startx"
-  user = "greeter"
-  ```
-- Reboot and hagreety will be set as your greeter
+# HGreet
+## Haskell package to interact with the greetd daemon trough it's IPC protocol.
+This package provides a module to interact with the greetd daemon trough it's IPC protocol.
+
+It is intended as a simple abstraction layer for the IPC protocol, and is NOT a greeter in and of itself.
+
+For an example of a working greeter based on this, see [hgreet-example](./hgreet-example).
 
 ## License
-Hagreety, a simple example greeter made with hgreet and based on agreety / agetty.
+HGreet, a haskell package to interact with the greetd daemon trough it's IPC protocol.
 Copyright (C) 2022  Hazel (Vawple)
 
 This program is free software: you can redistribute it and/or modify
