@@ -6,11 +6,13 @@
 #-}
 
 module IPCPacket ( Request(..), Response(..), AuthMessageType(..), ErrorType(..)
-                 , encodeRequestPacket, decodeResponsePacket) where
+                 , encodeRequestPacket, decodeResponsePacket, encodeLen, decodeLen) where
 
 import Data.Maybe
 import Data.Aeson hiding (Success, Error)
 import GHC.Generics
+import System.Endian
+import Sound.OSC.Coding.Byte (encode_u32, encode_u32_le, decode_u32, decode_u32_le)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 
@@ -40,17 +42,17 @@ data ErrorType
     deriving (Show, Eq)
 
 instance ToJSON Request where
-    toJSON (CreateSession username)            = object ["username" .= username]
-    toJSON (PostAuthMessageResponse response)  = object ["response" .= response]
-    toJSON (StartSession cmd)                  = object ["cmd" .= cmd]
-    toJSON (CancelSession)                     = object []
+    toJSON (CreateSession username)            = object ["type" .= "create_session",              "username" .= username]
+    toJSON (PostAuthMessageResponse response)  = object ["type" .= "post_auth_message_response",  "response" .= response]
+    toJSON (StartSession cmd)                  = object ["type" .= "start_session", "cmd" .= cmd]
+    toJSON (CancelSession)                     = object ["type" .= "cancel_session"]
 
 instance FromJSON Response where
     parseJSON = withObject "Response" $ \v -> do
         v .: "type" >>= withText "type" \case
             "success"       -> return Success
-            "error"         -> Error <$> v .: "error_type" <*> v .: "description"
-            "auth_message"  -> AuthMessage <$> v .: "auth_message_type" <*> v .: "auth_message"
+            "error"         -> Error        <$> v .: "error_type"         <*> v .: "description"
+            "auth_message"  -> AuthMessage  <$> v .: "auth_message_type"  <*> v .: "auth_message"
             _               -> fail "Invalid response type"  
 
 instance FromJSON ErrorType where
@@ -69,11 +71,21 @@ instance FromJSON AuthMessageType where
 
 encodeRequestPacket :: Request -> B.ByteString
 encodeRequestPacket request = BL.toStrict $ packet where
-    encodedRequest = encode request
-    encodedLength  = encode $ fromIntegral $ BL.length encodedRequest
+    encodedRequest = encode     $ request
+    encodedLength  = encodeLen  $ fromIntegral $ BL.length encodedRequest
     packet         = encodedLength `BL.append` encodedRequest
 
 decodeResponsePacket :: B.ByteString -> Response
 decodeResponsePacket packet = case decode $ BL.fromStrict packet of
     Just response -> response
     Nothing       -> Error OtherError "Invalid response packet, Nothing"
+
+encodeLen :: Int -> BL.ByteString
+encodeLen len = case getSystemEndianness of
+    BigEndian     -> encode_u32     $ len
+    LittleEndian  -> encode_u32_le  $ len
+
+decodeLen :: BL.ByteString -> Int
+decodeLen len = case getSystemEndianness of
+    BigEndian     -> decode_u32     $ len
+    LittleEndian  -> decode_u32_le  $ len

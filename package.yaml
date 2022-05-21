@@ -24,6 +24,8 @@ dependencies:
 - aeson
 - bytestring
 - network
+- cpu
+- hosc
 
 library:
   source-dirs: src

@@ -1,11 +1,10 @@
 module IPCClient ( runIPCClient, awaitSendIPCPacket ) where
 import Network.Socket
-import Data.Aeson (decode)
 import Data.Maybe (fromJust)
 import Network.Socket.ByteString (recv, sendAll, send)
 import qualified Data.ByteString.Lazy as BL
 import qualified Control.Exception as E
-import IPCPacket ( Request(..), Response(..), AuthMessageType(..), ErrorType(..), encodeRequestPacket, decodeResponsePacket )
+import IPCPacket ( Request(..), Response(..), AuthMessageType(..), ErrorType(..), encodeRequestPacket, decodeResponsePacket, decodeLen )
 
 runIPCClient :: String -> (Socket -> IO a) -> IO a
 runIPCClient path client = do
@@ -25,7 +24,7 @@ sendIPCPacket sock req = sendAll sock $ encodeRequestPacket req
 recvIPCPacket :: Socket -> IO Response
 recvIPCPacket sock = do
     len <- recv sock 4
-    let len' = fromJust $ decode ( BL.fromStrict len ) :: Int
+    let len' = decodeLen ( BL.fromStrict len ) :: Int
     packet <- recv sock len'
     return $ decodeResponsePacket packet
 
