@@ -1,4 +1,4 @@
-module IPCClient ( runIPCClient, awaitSendIPCPacket ) where
+module IPCClient ( runIPCClient, awaitSendIPCPacket, sendIPCPacket, recvIPCPacket ) where
 import Network.Socket
 import Data.Maybe (fromJust)
 import Network.Socket.ByteString (recv, sendAll, send)

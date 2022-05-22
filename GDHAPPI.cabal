@@ -12,7 +12,7 @@ bug-reports:    https://github.com/Vawlpe/GDHAPPI/issues
 author:         Hazel (Vawlpe)
 maintainer:     vawlpe@gmail.com
 copyright:      2022 Hazel (Vawlpe)
-license:        GP3
+license:        GPL-3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
