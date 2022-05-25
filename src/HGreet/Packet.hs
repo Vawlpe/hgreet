@@ -5,8 +5,8 @@
            ,  ExtendedDefaultRules
 #-}
 
-module IPCPacket ( Request(..), Response(..), AuthMessageType(..), ErrorType(..)
-                 , encodeRequestPacket, decodeResponsePacket, encodeLen, decodeLen) where
+module HGreet.Packet ( Request(..), Response(..), AuthMessageType(..), ErrorType(..)
+                 , encodeRequest, decodeResponse, encodeLen, decodeLen) where
 
 import Data.Maybe
 import Data.Aeson hiding (Success, Error)
@@ -24,7 +24,7 @@ data Request
     deriving (Generic, Show, Eq)
 
 data Response
-    = Success      
+    = Success
     | Error        {error_type         :: ErrorType,        description   :: String}
     | AuthMessage  {auth_message_type  :: AuthMessageType,  auth_message  :: String}
     deriving (Generic, Show, Eq)
@@ -40,6 +40,7 @@ data ErrorType
     = AuthError
     | OtherError
     deriving (Show, Eq)
+
 
 instance ToJSON Request where
     toJSON (CreateSession username)            = object ["type" .= "create_session",              "username" .= username]
@@ -69,14 +70,14 @@ instance FromJSON AuthMessageType where
         "error"   -> return ErrorType
         _         -> fail "Invalid auth message type"
 
-encodeRequestPacket :: Request -> B.ByteString
-encodeRequestPacket request = BL.toStrict $ packet where
+encodeRequest :: Request -> B.ByteString
+encodeRequest request = BL.toStrict $ packet where
     encodedRequest = encode     $ request
     encodedLength  = encodeLen  $ fromIntegral $ BL.length encodedRequest
     packet         = encodedLength `BL.append` encodedRequest
 
-decodeResponsePacket :: B.ByteString -> Response
-decodeResponsePacket packet = case decode $ BL.fromStrict packet of
+decodeResponse :: B.ByteString -> Response
+decodeResponse packet = case decode $ BL.fromStrict packet of
     Just response -> response
     Nothing       -> Error OtherError "Invalid response packet, Nothing"
 
