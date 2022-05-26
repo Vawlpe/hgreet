@@ -77,9 +77,7 @@ encodeRequest request = BL.toStrict $ packet where
     packet         = encodedLength `BL.append` encodedRequest
 
 decodeResponse :: B.ByteString -> Response
-decodeResponse packet = case decode $ BL.fromStrict packet of
-    Just response -> response
-    Nothing       -> Error OtherError "Invalid response packet, Nothing"
+decodeResponse = fromJust . decode . BL.fromStrict
 
 encodeLen :: Int -> BL.ByteString
 encodeLen len = case getSystemEndianness of

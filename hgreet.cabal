@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               hgreet
-version:            0.0.0.1
+version:            0.1.0.0
 synopsis:           Haskell client for the IPC protocol of the greetd daemon.
 description:
                     This package provides a Haskell client to interact with the greetd daemon.
@@ -16,9 +16,9 @@ extra-source-files:
     README.md
     LICENSE
 
--- source-repository head
---     type: git
---     location: https://github.com/Vawlpe/hgreet.git
+source-repository head
+    type: git
+    location: https://github.com/Vawlpe/hgreet.git
 
 library
     hs-source-dirs:

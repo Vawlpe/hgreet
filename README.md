@@ -1,4 +1,5 @@
 # HGreet
+<<<<<<< HEAD
 ## Haskell package to interact with the greetd daemon trough it's IPC protocol.
 This package provides a module to interact with the greetd daemon trough it's IPC protocol.
 
@@ -8,6 +9,7 @@ For an example of a working greeter based on this, see [hgreet-example](./hgreet
 
 ## License
 HGreet, a haskell package to interact with the greetd daemon trough it's IPC protocol.
+
 Copyright (C) 2022  Hazel (Vawple)
 
 This program is free software: you can redistribute it and/or modify
