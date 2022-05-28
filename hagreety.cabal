@@ -1,0 +1,28 @@
+cabal-version:      2.4
+name:               hagreety
+version:            0.1.0.0
+synopsis:           A simple example greeter made with hgreet based of agreety / agetty.
+license:            GPL-3.0-or-later
+author:             Vawlpe
+maintainer:         vawlpe@gmail.com
+copyright:          Copyright (C) 2022 Hazel (Vawlpe)
+category:           System
+license-file:       LICENSE
+homepage:           https://github.com/Vawlpe/hagreety
+bug-reports:        https://github.com/Vawlpe/hagreety/issue
+extra-source-files:
+    CHANGELOG.md
+    README.md
+
+source-repository head
+    type: github
+    location: https://github.com/Vawlpe/hagreety.git
+
+executable hagreety
+    main-is:          Main.hs
+    hs-source-dirs:
+        - src
+    build-depends:
+        , base ^>=4.14.3.0
+        , hgreet
+    default-language: Haskell2010
