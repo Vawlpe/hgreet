@@ -2,19 +2,21 @@ cabal-version:      2.4
 name:               hgreet
 version:            0.1.0.0
 synopsis:           Haskell client for the IPC protocol of the greetd daemon.
-description:
-                    This package provides a Haskell client to interact with the greetd daemon.
-                    It is intended as a simple abstraction layer for the IPC protocol, and is NOT a greeter in and of itself.
-                    For an example of a working greeter based on this, see the 'hagreety' package instead.
 license:            GPL-3.0-or-later
 author:             Vawlpe
 maintainer:         vawlpe@gmail.com
 copyright:          Copyright (C) 2022 Hazel (Vawlpe)
 category:           Network
+license-file:       LICENSE
+homepage:           https://github.com/Vawlpe/hgreet
+bug-reports:        https://github.com/Vawlpe/hgreet/issues
+description:
+    This package provides a Haskell client to interact with the greetd daemon.
+    It is intended as a simple abstraction layer for the IPC protocol, and is NOT a greeter in and of itself.
+    For an example of a working greeter based on this, see the 'hagreety' package instead.
 extra-source-files:
     ChangeLog.md
     README.md
-    LICENSE
 
 source-repository head
     type: git

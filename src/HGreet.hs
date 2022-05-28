@@ -1,3 +1,4 @@
 module HGreet (Client, Packet) where
-import HGreet.Client
-import HGreet.Packet
+import qualified HGreet.Client as Client
+import qualified HGreet.Packet as Packet 
+

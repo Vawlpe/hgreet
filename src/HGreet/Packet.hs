@@ -46,7 +46,7 @@ instance ToJSON Request where
     toJSON (CreateSession username)            = object ["type" .= "create_session",              "username" .= username]
     toJSON (PostAuthMessageResponse response)  = object ["type" .= "post_auth_message_response",  "response" .= response]
     toJSON (StartSession cmd)                  = object ["type" .= "start_session", "cmd" .= cmd]
-    toJSON (CancelSession)                     = object ["type" .= "cancel_session"]
+    toJSON CancelSession                       = object ["type" .= "cancel_session"]
 
 instance FromJSON Response where
     parseJSON = withObject "Response" $ \v -> do
@@ -71,8 +71,8 @@ instance FromJSON AuthMessageType where
         _         -> fail "Invalid auth message type"
 
 encodeRequest :: Request -> B.ByteString
-encodeRequest request = BL.toStrict $ packet where
-    encodedRequest = encode     $ request
+encodeRequest request = BL.toStrict packet where
+    encodedRequest = encode request
     encodedLength  = encodeLen  $ fromIntegral $ BL.length encodedRequest
     packet         = encodedLength `BL.append` encodedRequest
 
@@ -80,11 +80,11 @@ decodeResponse :: B.ByteString -> Response
 decodeResponse = fromJust . decode . BL.fromStrict
 
 encodeLen :: Int -> BL.ByteString
-encodeLen len = case getSystemEndianness of
-    BigEndian     -> encode_u32     $ len
-    LittleEndian  -> encode_u32_le  $ len
+encodeLen = case getSystemEndianness of
+    BigEndian     -> encode_u32
+    LittleEndian  -> encode_u32_le
 
 decodeLen :: BL.ByteString -> Int
-decodeLen len = case getSystemEndianness of
-    BigEndian     -> decode_u32     $ len
-    LittleEndian  -> decode_u32_le  $ len
+decodeLen = case getSystemEndianness of
+    BigEndian     -> decode_u32
+    LittleEndian  -> decode_u32_le
