@@ -2,5 +2,5 @@ packages: hagreety.cabal
 
 source-repository-package
     type: git
-    location: git://github.com/Vawlpe/hgreet.git
+    location: https://github.com/Vawlpe/hgreet.git
     tag: HEAD
