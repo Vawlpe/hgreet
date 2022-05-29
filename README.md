@@ -1,5 +1,31 @@
 # Hagreety
 ## A simple example greeter made with hgreet based on agreety / agetty
+#### This is only an example, hagreety is not a good greeter.
+#### It is only meant to show you the basics of how to implement your own greeter in haskell using the [hgreet](https://github.com/Vawlpe/hgreet) package.
+### Installation
+- [Install greetd](https://sr.ht/~kennylevinsen/greetd/)
+- Make sure your `greeter` user has a proper home directory:
+  ```shell
+  sudo mkdir /home/greeter
+  sudo usermod -d /home/greeter greeter
+  ```
+- **As the** ***greeter*** **user**, [Install GHCup](https://www.haskell.org/ghcup/)
+- Still ***as the greeter user***, Clone this repository:
+  ```shell
+  git clone https://github.com/Vawlpe/hagreety.git
+  ```
+- And (still as the ***greeter*** user), build and install hagreety:
+  ```shell
+  cd hagreety
+  cabal install
+  ```
+- Finally, edit and save the `/etc/greetd/config.toml` file as ***root*** to replace the `default_session` section with the following:
+  ```toml
+  [default_session]
+  command = "~/hagreety startx"
+  user = "greeter"
+  ```
+- Reboot and hagreety will be set as your greeter
 
 ## License
 Hagreety, a simple example greeter made with hgreet and based on agreety / agetty.

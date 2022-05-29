@@ -2,6 +2,9 @@ cabal-version:      2.4
 name:               hagreety
 version:            0.1.0.0
 synopsis:           A simple example greeter made with hgreet based of agreety / agetty.
+description:
+    This is only an example, hagreety is not a good greeter.
+    It is only meant to show you the basics of how to implement your own greeter in haskell using the 'hgreet' package.
 license:            GPL-3.0-or-later
 author:             Vawlpe
 maintainer:         vawlpe@gmail.com
@@ -20,8 +23,7 @@ source-repository head
 
 executable hagreety
     main-is:          Main.hs
-    hs-source-dirs:
-        - src
+    hs-source-dirs:    src
     build-depends:
         , base >= 4.10 && < 5
         , hgreet
