@@ -1,24 +1,35 @@
 module Main where
-import qualified HGreet.Client as C
+import System.Environment (getEnv)
+import Data.Functor (($>), (<&>))
+import Network.Socket
+import Control.Exception (bracket_)
+import System.IO
+import qualified HGreet.Client as C (send, recv, handleResponse, withSocketDo, PromptResult(..))
 import qualified HGreet.Packet as P
+
 main :: IO ()
 main = do
     sockPath <- getEnv "GREETD_SOCK"
-    withSocketDo sockPath $ \sock -> do
-        handleResponse handler Nothing sock ["startx"]
+    C.withSocketDo sockPath $ \sock -> do
+        C.handleResponse handler Nothing sock ["ls"]
     where
-        handler :: Response -> IO C.PromptResult
-        handler Success = putStr "Success" >> C.Success
-        handler (AuthMessage t m) = case t of
-            Visible  -> case m of
-                "Username:" -> putStrFlush m >> getLine <&> C.Username
-                _           -> putStrFlush m >> getLine <&> C.Auth
-            Secret   -> putStrFlush m >> withEcho False getLine <&> C.Auth
-            Info      -> putStrLn ("Info: " ++ m) >> C.Info
-            ErrorType -> prompt (Error OtherError m)
-        handler (Error t m) = case t of
-            AuthError  -> putStrLn ("Authentication failed: " ++ m) >> C.Error
-            OtherError -> putStrLn ("Error: " ++ m) >> C.Error
+        handler :: P.Response -> IO C.PromptResult
+        handler P.Success = putStr "Success" >> return C.Success
+        handler (P.AuthMessage t m) = case t of
+            P.Visible  -> putStrFlush m >> getLine <&> case m of
+                "Username:" -> C.Username
+                _           -> C.Auth
+
+            P.Secret    -> do
+                putStrFlush m 
+                inp <- withEcho False getLine
+                putChar '\n'
+                return $ C.Auth inp
+            P.Info      -> putStrLn ("Info: " ++ m) >> return C.Info
+            P.ErrorType -> putStrLn ("Error: " ++ m) >> return C.Error
+        handler (P.Error t m) = case t of
+            P.AuthError  -> putStrLn ("Authentication failed: " ++ m) $> C.Error
+            P.OtherError -> putStrLn ("Error: " ++ m) >> return C.Error
 
         putStrFlush :: String -> IO ()
         putStrFlush s = putStr s >> hFlush stdout
