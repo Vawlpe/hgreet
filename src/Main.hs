@@ -1,5 +1,5 @@
 module Main where
-import System.Environment (getEnv)
+import System.Environment (getEnv, getArgs)
 import Data.Functor (($>), (<&>))
 import Network.Socket
 import Control.Exception (bracket_)
@@ -9,9 +9,10 @@ import qualified HGreet.Packet as P
 
 main :: IO ()
 main = do
+    cmd <- getArgs
     sockPath <- getEnv "GREETD_SOCK"
     C.withSocketDo sockPath $ \sock -> do
-        C.handleResponse handler Nothing sock ["ls"]
+        C.handleResponse handler Nothing sock cmd
     where
         handler :: P.Response -> IO C.PromptResult
         handler P.Success = putStr "Success" >> return C.Success
