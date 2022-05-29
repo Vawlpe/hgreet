@@ -12,7 +12,7 @@ import qualified Data.ByteString.Lazy as BL
 import qualified Control.Exception as E
 import qualified Network.Socket as NS
 import qualified Network.Socket.ByteString as NSB
-import qualified HGreet.Packet as Packet ( Request(..), Response(..), AuthMessageType(..), ErrorType(..), encodeRequest, decodeResponse, decodeLen )
+import qualified HGreet.Packet as P ( Request(..), Response(..), AuthMessageType(..), ErrorType(..), encodeRequest, decodeResponse, decodeLen )
 
 withSocketDo :: String -> (NS.Socket -> IO a) -> IO a
 withSocketDo path client = do
@@ -26,35 +26,36 @@ withSocketDo path client = do
         NS.setSocketOption sock NS.ReuseAddr 1
         return sock
 
-send :: NS.Socket -> Packet.Request -> IO ()
-send sock req = NSB.sendAll sock $ Packet.encodeRequest req
+send :: NS.Socket -> P.Request -> IO ()
+send sock req = NSB.sendAll sock $ P.encodeRequest req
 
-recv :: NS.Socket -> IO Packet.Response
+recv :: NS.Socket -> IO P.Response
 recv sock = do
     len <- NSB.recv sock 4
-    let len' = Packet.decodeLen ( BL.fromStrict len ) :: Int
+    let len' = P.decodeLen ( BL.fromStrict len ) :: Int
     packet <- NSB.recv sock len'
-    return $ Packet.decodeResponse packet
+    return $ P.decodeResponse packet
 
-handleResponse :: (Packet.Response -> IO PromptResult) -> Maybe Packet.Response -> NS.Socket -> [String] -> IO ()
+handleResponse :: (P.Response -> IO PromptResult) -> Maybe P.Response -> NS.Socket -> [String] -> IO ()
 handleResponse handler resp sock cmd = case resp of
-    Nothing -> handleResponse handler (Just (Packet.AuthMessage Packet.Visible "Username:")) sock cmd
+    Nothing -> handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
     Just resp -> handler resp >>= \case
         Error -> do
             threadDelay 2000000
-            handleResponse handler (Just (Packet.AuthMessage Packet.Visible "Username:")) sock cmd
+            send sock P.CancelSession
+            handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
         Username msg -> do
-            send sock $ Packet.CreateSession msg
+            send sock $ P.CreateSession msg
             rsp <- recv sock 
             handleResponse handler (Just rsp) sock cmd
         Auth msg -> do
-            send sock $ Packet.PostAuthMessageResponse $ Just msg
+            send sock $ P.PostAuthMessageResponse $ Just msg
             rsp <- recv sock
             handleResponse handler (Just rsp) sock cmd
         Info -> do 
             rsp <- recv sock
             handleResponse handler (Just rsp) sock cmd
-        Success -> send sock $ Packet.StartSession cmd
+        Success -> send sock $ P.StartSession cmd
 
 data PromptResult
     = Success
