@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase 
            , DeriveGeneric
 #-}
-module HGreet.Client ( withSocketDo, send, recv ) where
+module HGreet.Client ( withSocketDo, send, recv, handleResponse, PromptResult(..) ) where
 import Data.Maybe (fromJust)
 import Data.Functor ((<&>))
 import Control.Exception (bracket_)
