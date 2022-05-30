@@ -1,5 +1,4 @@
 # HGreet
-<<<<<<< HEAD
 ## Haskell package to interact with the greetd daemon trough it's IPC protocol.
 This package provides a module to interact with the greetd daemon trough it's IPC protocol.
 

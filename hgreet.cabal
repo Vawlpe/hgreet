@@ -1,7 +1,7 @@
 cabal-version:      2.4
 name:               hgreet
 version:            0.1.0.0
-synopsis:           Haskell client for the IPC protocol of the greetd daemon.
+synopsis:           Haskell module to interact with the greetd daemon trough it's IPC protocol.
 license:            GPL-3.0-or-later
 author:             Vawlpe
 maintainer:         vawlpe@gmail.com
