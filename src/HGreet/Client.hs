@@ -14,7 +14,7 @@ To use this module, you need to have greetd installed and the daemon running, wi
 Get the path to the socket of the greetd daemon from the environment variable @GREETD_SOCK@.
 Then you can communicate with greetd using the `withSocketDo` function of this module, passing it a callback function that will have direct acccess to the open socket.
 -}
-module HGreet.Client ( withSocketDo, send, recv, handleResponse, PromptResult(..), NS.Socket ) where
+module HGreet.Client (withSocketDo, send, recv, handleResponse, PromptResult(..)) where
 
 import Data.Maybe (fromJust)
 import Data.Functor ((<&>))
