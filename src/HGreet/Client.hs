@@ -1,7 +1,21 @@
 {-# LANGUAGE LambdaCase 
            , DeriveGeneric
 #-}
-module HGreet.Client ( withSocketDo, send, recv, handleResponse, PromptResult(..) ) where
+{-|
+Module         : HGreet.Client
+Description    : Simplified communication with the greetd daemon.
+Copyright      : (c) Hazel (Vawlpe), 2022
+License        : GPL-3.0-or-later
+Maintainer     : vawlpe@gmail.com
+Stability      : experimental
+Portability    : Linux
+
+To use this module, you need to have greetd installed and the daemon running, with a valid configuration file.
+Get the path to the socket of the greetd daemon from the environment variable @GREETD_SOCK@.
+Then you can communicate with greetd using the `withSocketDo` function of this module, passing it a callback function that will have direct acccess to the open socket.
+-}
+module HGreet.Client ( withSocketDo, send, recv, handleResponse, PromptResult(..), NS.Socket ) where
+
 import Data.Maybe (fromJust)
 import Data.Functor ((<&>))
 import Control.Exception (bracket_)
@@ -14,7 +28,15 @@ import qualified Network.Socket as NS
 import qualified Network.Socket.ByteString as NSB
 import qualified HGreet.Packet as P ( Request(..), Response(..), AuthMessageType(..), ErrorType(..), encodeRequest, decodeResponse, decodeLen )
 
-withSocketDo :: String -> (NS.Socket -> IO a) -> IO a
+{-
+  The `withSocketDo` function takes a to the socket of the greetd daemon and a callback function which will have access to the open socket.
+  Within the callback function, you may use the send and recv functions and the HGreet.Packet module to communicate with the greetd daemon directly.
+  Alternatively you can use the `handleResponse` function to implement the default login routine of greetd given a handler function.
+  For examples on how to do both of these, see the "hagreety" package.
+-}
+withSocketDo :: String              -- ^ Path to the socket of the greetd daemon, usually found in the environment variable @GREETD_SOCK@
+             -> (NS.Socket -> IO a) -- ^ Callback function that will have direct access to the open socket.
+             -> IO a                -- ^ Result of the callback function as an IO action.
 withSocketDo path client = do
     E.bracket (open path) NS.close client
   where
@@ -26,22 +48,44 @@ withSocketDo path client = do
         NS.setSocketOption sock NS.ReuseAddr 1
         return sock
 
-send :: NS.Socket -> P.Request -> IO ()
+{-
+ Send a `HGreet.Packet.Request` to the greetd daemon given an open socket.
+ Usually used within the callback of a `withSocketDo` function to implement low level communication with the greetd daemon.
+-}
+send :: NS.Socket -- ^ Open socket to the greetd daemon, usually obtained from the callback of a `withSocketDo` function.
+     -> P.Request -- ^ `HGreet.Packet.Request` to send to the greetd daemon.
+     -> IO ()     -- ^ Empty IO action result.
 send sock req = NSB.sendAll sock $ P.encodeRequest req
 
-recv :: NS.Socket -> IO P.Response
+{-
+ Receive a `HGreet.Packet.Response` from the greetd daemon given an open socket.
+ Usually used within the callback of a withSocketDo function to implement low level communication with the greetd daemon.
+-}
+recv :: NS.Socket     -- ^ Open socket to the greetd daemon, usually obtained from the callback of a `withSocketDo` function.
+     -> IO P.Response -- ^ `HGreet.Packet.Response` received from the greetd daemon as an IO action.
 recv sock = do
     len <- NSB.recv sock 4
     let len' = P.decodeLen ( BL.fromStrict len ) :: Int
     packet <- NSB.recv sock len'
     return $ P.decodeResponse packet
 
-handleResponse :: (P.Response -> IO PromptResult) -> Maybe P.Response -> NS.Socket -> [String] -> IO ()
+{-
+ Generic default login routine for greetd.
+ Allows you to simply slap a handler function to deal with user input and have a working greeter with minimal effort.
+ Currently potentially broken and or vulnerable, so use at your own risk, and report any bugs you find.
+ See "hagreety" package for examples.
+-}
+handleResponse :: (P.Response -> IO PromptResult) -- ^ Handler function that will be called for every response from greetd.
+               -> Maybe P.Response                -- ^ Response from greetd that will be passed to the handler function, leave empty on initial call.
+               -> NS.Socket                       -- ^ Open socket to the greetd daemon, usually obtained from the callback of a `withSocketDo` function.
+               -> [String]                        -- ^ List of strings to pass as the command to execute to start session after authentication.
+               -> IO ()                           -- ^ Empty IO action result.
 handleResponse handler resp sock cmd = case resp of
     Nothing -> handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
     Just resp -> handler resp >>= \case
         Error -> do
             threadDelay 2000000
+            send sock P.CancelSession
             send sock P.CancelSession
             handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
         Username msg -> do
@@ -57,10 +101,14 @@ handleResponse handler resp sock cmd = case resp of
             handleResponse handler (Just rsp) sock cmd
         Success -> send sock $ P.StartSession cmd
 
+{- 
+  Prompt result type for handler functions that work with `handleResponse`.
+  See "hagreety" package for examples.
+-}
 data PromptResult
-    = Success
-    | Error
-    | Info
-    | Username String
-    | Auth String
+    = Success         -- ^ Successful prompt result. See "hagreety" package for examples.
+    | Error           -- ^ Error prompt result. See "hagreety" package for examples.
+    | Info            -- ^ Info prompt result. See "hagreety" package for examples.
+    | Username String -- ^ Hacked together Username prompt result. See "hagreety" package for examples.
+    | Auth String     -- ^ Auth prompt result. See "hagreety" package for examples.
     deriving (Generic, Eq, Show)

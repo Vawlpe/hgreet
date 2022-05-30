@@ -11,9 +11,9 @@ license-file:       LICENSE
 homepage:           https://github.com/Vawlpe/hgreet
 bug-reports:        https://github.com/Vawlpe/hgreet/issues
 description:
-    This package provides a Haskell client to interact with the greetd daemon.
+    This package provides a Haskell module to interact with the greetd daemon.
     It is intended as a simple abstraction layer for the IPC protocol, and is NOT a greeter in and of itself.
-    For an example of a working greeter based on this, see the 'hagreety' package instead.
+    For an example of a working greeter based on this, see the "hagreety" package instead.
 extra-source-files:
     ChangeLog.md
     README.md
@@ -23,8 +23,7 @@ source-repository head
     location: https://github.com/Vawlpe/hgreet.git
 
 library
-    hs-source-dirs:
-        - src
+    hs-source-dirs: src
     exposed-modules: HGreet.Packet, HGreet.Client
     exposed: True
     build-depends:
