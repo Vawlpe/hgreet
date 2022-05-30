@@ -1,6 +1,6 @@
 # Hagreety
 ## A simple example greeter made with hgreet based on agreety / agetty
-#### This is only an example, hagreety is not a good greeter.
+#### This is only an example, hagreety is not a good greeter, in fact it's almost certainly buggy.
 #### It is only meant to show you the basics of how to implement your own greeter in haskell using the [hgreet](https://github.com/Vawlpe/hgreet) package.
 ### Installation
 - [Install greetd](https://sr.ht/~kennylevinsen/greetd/)
