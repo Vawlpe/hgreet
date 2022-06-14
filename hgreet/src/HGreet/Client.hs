@@ -84,6 +84,8 @@ handleResponse handler resp sock cmd = case resp of
     Just resp -> handler resp >>= \case
         Error -> do
             threadDelay 2000000
+            send sock P.CancelSession
+            send sock P.CancelSession
             handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
         Username msg -> do
             send sock $ P.CreateSession msg

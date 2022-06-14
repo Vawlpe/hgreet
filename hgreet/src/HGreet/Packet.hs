@@ -48,7 +48,7 @@ data AuthMessageType
     = Visible   -- ^ Indicates that the input from the user should be visible when they answer this question.
     | Secret    -- ^ Indicates that input from the user should be considered secret when they answer this question.
     | Info      -- ^ Indicates that this message is informative, not a question.
-    | ErrorAuth -- ^ Indicates that this message is an error, not a question.
+    | ErrorType -- ^ Indicates that this message is an error, not a question.
     deriving (Show, Eq)
 
 -- ** Error message packet type enums (greetd-ipc(7) line 96)
@@ -81,7 +81,7 @@ instance FromJSON AuthMessageType where
         "visible" -> return Visible
         "secret"  -> return Secret
         "info"    -> return Info
-        "error"   -> return ErrorAuth
+        "error"   -> return ErrorType
         _         -> fail "Invalid auth message type"
 
 -- ** parseJSON decoding instances for ErrorType packets.
