@@ -43,14 +43,13 @@ main = do
             P.Visible  -> putStrFlush m >> getLine <&> case m of
                 "Username:" -> C.Username
                 _           -> C.Auth
-
             P.Secret    -> do
                 putStrFlush m
                 inp <- withEcho False getLine
                 putChar '\n'
                 return $ C.Auth inp
             P.Info      -> putStrLn ("Info: " ++ m) >> return C.Info
-            P.ErrorType -> putStrLn ("Error: " ++ m) >> return C.Error
+            P.ErrorAuth -> putStrLn ("Error: " ++ m) >> return C.Error
         handler (P.Error t m) = case t of
             P.AuthError  -> putStrLn ("Authentication failed: " ++ m) $> C.Error
             P.OtherError -> putStrLn ("Error: " ++ m) >> return C.Error
