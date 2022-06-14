@@ -10,9 +10,9 @@ Maintainer     : vawlpe@gmail.com
 Stability      : experimental
 Portability    : Linux
 
-To use this module, you need to have greetd installed and the daemon running, with a valid configuration file.
-Get the path to the socket of the greetd daemon from the environment variable @GREETD_SOCK@.
+To use this module, first get the path to the socket of the greetd daemon from the environment variable @GREETD_SOCK@. This requires the greetd daemon to be running.
 Then you can communicate with greetd using the `withSocketDo` function of this module, passing it a callback function that will have direct acccess to the open socket.
+For a simplified communication scheme you can implement a @handler@ and pass it to @handleResponse@ alongside the socket and command to run on successful authentication.
 -}
 module HGreet.Client (withSocketDo, send, recv, handleResponse, PromptResult(..)) where
 
@@ -72,8 +72,7 @@ recv sock = do
 {-
  Generic default login routine for greetd.
  Allows you to simply slap a handler function to deal with user input and have a working greeter with minimal effort.
- Currently potentially broken and or vulnerable, so use at your own risk, and report any bugs you find.
- See "hagreety" package for examples.
+ Currently kinda broken, will fix soon.
 -}
 handleResponse :: (P.Response -> IO PromptResult) -- ^ Handler function that will be called for every response from greetd.
                -> Maybe P.Response                -- ^ Response from greetd that will be passed to the handler function, leave empty on initial call.
@@ -103,12 +102,11 @@ handleResponse handler resp sock cmd = case resp of
 
 {- 
   Prompt result type for handler functions that work with `handleResponse`.
-  See "hagreety" package for examples.
 -}
 data PromptResult
-    = Success         -- ^ Successful prompt result. See "hagreety" package for examples.
-    | Error           -- ^ Error prompt result. See "hagreety" package for examples.
-    | Info            -- ^ Info prompt result. See "hagreety" package for examples.
-    | Username String -- ^ Hacked together Username prompt result. See "hagreety" package for examples.
-    | Auth String     -- ^ Auth prompt result. See "hagreety" package for examples.
+    = Success         -- ^ Successful prompt result.
+    | Error           -- ^ Error prompt result.
+    | Info            -- ^ Info prompt result.
+    | Username String -- ^ Hacked together Username prompt result.
+    | Auth String     -- ^ Auth prompt result.
     deriving (Generic, Eq, Show)

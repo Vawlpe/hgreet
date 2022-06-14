@@ -1,5 +1,5 @@
 {-
-Module      : Hagreety
+Module      : hgreet-example
 Description : A simple example greeeter made with hgreet based of agreety / agetty.
 Copyright   : (c) Hazel (Vawlpe), 2022
 License     : GPL-3.0-or-later
@@ -7,8 +7,8 @@ Maintainer  : vawlpe@gmail.com
 Stability   : experimental
 Portability : Linux
 
-This is only an example, hagreety is not a good greeter, in fact is' almost certainly buggy.
-It is only meant to show you the basics of how to implement your own greeter in haskell using the "hgreet" package.
+This is only an example greeter to show you the general steps involved with creating a working greeter using @hgreet@ and @greetd@
+Please do NOT use this as your default systemwide greeter, I cannot guarantee the security or reliability of this example.
 -}
 module Main where
 import System.Environment (getEnv, getArgs)
@@ -20,14 +20,14 @@ import qualified HGreet.Packet as P
 
 -- * Simple command line greeter
 -- | This is the main function of the greeter.
--- It will take a command to run to start a session after the greeter has been started from the command line.
--- Usage is: @hagreety <command>@ where <command> is the command to run to start the session and it's parameters (if any), separated by spaces, no quotes.
--- Example: @hagreety startx@
--- This will start a session with the command @startx@.
+-- It will take a command to run to start a session after the greeter has successfully authenticated a user.
+-- Usage is: @example <command>@ where <command> is the command to run to start the session and it's parameters (if any), separated by spaces, no quotes.
+-- Example: @example startx@
+-- This will start an x11 session with the command @startx@.
 --
 -- The greeter also takes the socket to connect to from the @GREETD_SOCK@ environment variable, which should be present if greetd is running correctly.
 --
--- The greeter will simply run a `HGreet.Client.handleResponse` loop given a handler function and an open socket socket, within the callback of a `HGreet.Client.withSocketDo` given the path to the socket. 
+-- The greeter will simply run a `HGreet.Client.handleResponse` loop given a handler function and an open socket socket, within the callback of a `HGreet.Client.withSocketDo` given the path to the socket.
 --
 -- For direct communcation with the socket rather then a handler, see the example bellow.
 -- $directCom

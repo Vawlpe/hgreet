@@ -8,8 +8,8 @@ Stability   : experimental
 Portability : Linux
 
 This module provides ways to interface with greetd through it's IPC protocol.
-You must have "greetd" installed and running for this to work, preferably "fakegreet" should also be installed for testing, so you should build greetd and fakegreet from source.
-See the "hagreety" package for example usage of this module.
+You must have @greetd@ installed and running for this to work, preferably @fakegreet@ should also be installed for testing.
+See @hgreet-example@ for a basic implementation of hgreet.
 -}
 module HGreet (Client, Packet) where
 import qualified HGreet.Client as Client

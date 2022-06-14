@@ -14,7 +14,6 @@ Stability     : experimental
 Portability   : Linux
 
 This module provides the data types listed in greetd-ipc(7) and the functions to encode them for usage with HGreet.Client.
-See the `hagreety` package for example usage of this module.
 -}
 module HGreet.Packet ( Request(..), Response(..), AuthMessageType(..), ErrorType(..)
                  , encodeRequest, decodeResponse, encodeLen, decodeLen) where
