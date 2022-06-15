@@ -10,11 +10,11 @@ maintainer:         vawlpe@gmail.com
 copyright:          Copyright (C) 2022 Hazel (Vawlpe)
 category:           System
 license:            GPL-3.0-or-later
-license-file:       ../LICENSE
+license-file:       LICENSE
 homepage:           https://github.com/Vawlpe/hgreet
 bug-reports:        https://github.com/Vawlpe/hgreet/issue
 extra-source-files:
-    ../README.md
+    README.md
 
 executable example
     main-is:          Main.hs

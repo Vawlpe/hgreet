@@ -76,28 +76,23 @@ recv sock = do
  Currently kinda broken, will fix soon.
 -}
 handleResponse :: (P.Response -> IO PromptResult) -- ^ Handler function that will be called for every response from greetd.
-               -> Maybe P.Response                -- ^ Response from greetd that will be passed to the handler function, leave empty on initial call.
+               -> P.Response                      -- ^ Response from greetd that will be passed to the handler function.
                -> NS.Socket                       -- ^ Open socket to the greetd daemon, usually obtained from the callback of a `withSocketDo` function.
                -> [String]                        -- ^ List of strings to pass as the command to execute to start session after authentication.
                -> IO ()                           -- ^ Empty IO action result.
-handleResponse handler resp sock cmd = case resp of
-    Nothing -> handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
-    Just resp -> handler resp >>= \case
+handleResponse handler resp sock cmd =
+    handler resp >>= \case
         Error -> do
             send sock P.CancelSession
             threadDelay 1500000
             exitFailure
-        Username msg -> do
-            send sock $ P.CreateSession msg
-            rsp <- recv sock 
-            handleResponse handler (Just rsp) sock cmd
         Auth msg -> do
             send sock $ P.PostAuthMessageResponse $ Just msg
             rsp <- recv sock
-            handleResponse handler (Just rsp) sock cmd
+            handleResponse handler rsp sock cmd
         Info -> do 
             rsp <- recv sock
-            handleResponse handler (Just rsp) sock cmd
+            handleResponse handler rsp sock cmd
         Success -> do
             send sock $ P.StartSession cmd
             threadDelay 500000
@@ -110,6 +105,5 @@ data PromptResult
     = Success         -- ^ Successful prompt result.
     | Error           -- ^ Error prompt result.
     | Info            -- ^ Info prompt result.
-    | Username String -- ^ Hacked together Username prompt result.
     | Auth String     -- ^ Auth prompt result.
     deriving (Generic, Eq, Show)

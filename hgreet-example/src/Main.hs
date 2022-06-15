@@ -35,29 +35,43 @@ main :: IO ()
 main = do
     cmd <- getArgs
     sockPath <- getEnv "GREETD_SOCK"
-    C.withSocketDo sockPath $ \sock -> C.handleResponse handler Nothing sock cmd
+    -- Create withSocketDo context
+    C.withSocketDo sockPath $ \sock -> do
+        -- Get username input
+        putStr "Username: "
+        hFlush stdout
+        inp <- getLine
+        -- The inital CreateSession package must be handled manually
+        C.send sock $ P.CreateSession inp
+        rsp <- C.recv sock
+        -- Now the handleResponse client can take over once we've gotten a valid inital response from greetd
+        C.handleResponse handler rsp sock cmd
     where
         handler :: P.Response -> IO C.PromptResult
-        handler P.Success = putStr "Success" >> return C.Success
+        -- If the response is P.Success just print out a nice message and return a Sucess handler response
+        handler P.Success = putStr "Success"                            $> C.Success
+        -- If the reponse is an auth message, first check it't type..
         handler (P.AuthMessage t m) = case t of
-            P.Visible  -> putStrFlush m >> getLine <&> case m of
-                "Username:" -> C.Username
-                _           -> C.Auth
-
-            P.Secret    -> do
-                putStrFlush m
+            -- If it's visible, print the auth message, get the user's input and return an Auth handler response
+            P.Visible  -> do
+                putStr $ m ++ " "
+                hFlush stdout                                         
+                inp <- getLine
+                return                                                  $ C.Auth inp
+            -- Otherwise if it's secret, make sure to disable input echo from getLine and do the same thing as the visible case
+            P.Secret  -> do
+                putStr $ m ++ " "
+                hFlush stdout
                 inp <- withEcho False getLine
-                putChar '\n'
-                return $ C.Auth inp
-            P.Info      -> putStrLn ("Info: " ++ m) >> return C.Info
-            P.ErrorType -> putStrLn ("Error: " ++ m) >> return C.Error
+                putChar '\n'                                            $> C.Auth inp
+            -- For the rest of the cases we just print out info/error messages and return the appropriate handler response
+            P.Info        -> putStrLn ("Info: " ++ m)                   $> C.Info
+            P.ErrorType   -> putStrLn ("Error: " ++ m)                  $> C.Error
         handler (P.Error t m) = case t of
-            P.AuthError  -> putStrLn ("Authentication failed: " ++ m) $> C.Error
-            P.OtherError -> putStrLn ("Error: " ++ m) >> return C.Error
+            P.AuthError   -> putStrLn ("Authentication failed: " ++ m)  $> C.Error
+            P.OtherError  -> putStrLn ("Error: " ++ m)                  $> C.Error
 
-        putStrFlush :: String -> IO ()
-        putStrFlush s = putStr s >> hFlush stdout
-
+        -- Executes an IO Action with echo optionally rather then implicitly enabled
         withEcho :: Bool -> IO a -> IO a
         withEcho echo action = do
             old <- hGetEcho stdin
