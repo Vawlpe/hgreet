@@ -4,7 +4,7 @@ This package provides a module to interact with the greetd daemon trough it's IP
 
 It is intended as a simple abstraction layer for the IPC protocol, and is NOT a greeter in and of itself.
 
-For an example of a working greeter based on this, see [hgreet-example](./hgreet-example).
+For an example of a working greeter based on this, see [hgreet-example](https://github.com/Vawlpe/hgreet/tree/main/hgreet-example).
 
 ## License
 HGreet, a haskell package to interact with the greetd daemon trough it's IPC protocol.

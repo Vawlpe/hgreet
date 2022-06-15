@@ -1,13 +1,10 @@
-# HGreet
-## Haskell package to interact with the greetd daemon trough it's IPC protocol.
-This package provides a module to interact with the greetd daemon trough it's IPC protocol.
-
-It is intended as a simple abstraction layer for the IPC protocol, and is NOT a greeter in and of itself.
-
-For an example of a working greeter based on this, see [hgreet-example](./hgreet-example).
+# HGreet-example
+## A simple example greeter made with hgreet based of agreety / agetty.
+This is only an example greeter to show you the general steps involved with creating a working greeter using `hgreet` and `greetd`
+Please do NOT use this as your default systemwide greeter, I cannot guarantee the security or reliability of this example.
 
 ## License
-HGreet, a haskell package to interact with the greetd daemon trough it's IPC protocol.
+HGreet-example, a simple example greeter made with hgreet based of agreety / agetty..
 
 Copyright (C) 2022  Hazel (Vawple)
 
