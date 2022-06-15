@@ -22,6 +22,7 @@ import Control.Exception (bracket_)
 import Control.Concurrent (threadDelay)
 import GHC.Generics (Generic)
 import System.IO
+import System.Exit
 import qualified Data.ByteString.Lazy as BL
 import qualified Control.Exception as E
 import qualified Network.Socket as NS
@@ -83,10 +84,9 @@ handleResponse handler resp sock cmd = case resp of
     Nothing -> handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
     Just resp -> handler resp >>= \case
         Error -> do
-            threadDelay 2000000
             send sock P.CancelSession
-            send sock P.CancelSession
-            handleResponse handler (Just (P.AuthMessage P.Visible "Username:")) sock cmd
+            threadDelay 1500000
+            exitFailure
         Username msg -> do
             send sock $ P.CreateSession msg
             rsp <- recv sock 
@@ -98,7 +98,10 @@ handleResponse handler resp sock cmd = case resp of
         Info -> do 
             rsp <- recv sock
             handleResponse handler (Just rsp) sock cmd
-        Success -> send sock $ P.StartSession cmd
+        Success -> do
+            send sock $ P.StartSession cmd
+            threadDelay 500000
+            exitSuccess
 
 {- 
   Prompt result type for handler functions that work with `handleResponse`.
